@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holy Nuclear Warfare</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #c8000a;
+    --dim-red: #7a0006;
+    --cream: #e8e0d0;
+    --ash: #b0a898;
+    --charcoal: #1a1814;
+    --black: #0d0c0b;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── PROGRESS BAR ─────────────────────────────────────────── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--red);
+    z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* ── NAV ──────────────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    mix-blend-mode: normal;
+    background: linear-gradient(to bottom, rgba(13,12,11,0.9), transparent);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ash);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--cream); }
+
+  /* ── HERO ─────────────────────────────────────────────────── */
+  #hero {
+    position: relative;
+    height: 200vh;
+  }
+
+  .hero-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Atomic_bombing_of_Japan.jpg/1280px-Atomic_bombing_of_Japan.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.25) contrast(1.2);
+    transform: scale(1.1);
+    transition: transform 0.05s linear;
+  }
+
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 0 24px;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: var(--display);
+    font-size: clamp(72px, 14vw, 180px);
+    line-height: 0.88;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .hero-title span { color: var(--red); }
+
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: clamp(13px, 1.5vw, 16px);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ash);
+    margin-top: 32px;
+    max-width: 480px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.8s forwards;
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards, pulse 2s ease 2s infinite;
+  }
+
+  .hero-image-reveal {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Atomic_bombing_of_Japan.jpg/1280px-Atomic_bombing_of_Japan.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    filter: brightness(0.5) contrast(1.1) grayscale(0.3);
+    transform: scale(0.92);
+    transition: opacity 0.05s, transform 0.05s;
+  }
+
+  /* ── SECTION BASE ─────────────────────────────────────────── */
+  section {
+    position: relative;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* ── INTRO SECTION ────────────────────────────────────────── */
+  #intro {
+    padding: 120px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .intro-headline {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.92;
+    color: var(--cream);
+    margin-bottom: 40px;
+  }
+
+  .intro-body {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ash);
+    max-width: 620px;
+    border-left: 1px solid var(--dim-red);
+    padding-left: 32px;
+  }
+
+  /* ── TIMELINE ─────────────────────────────────────────────── */
+  #timeline {
+    position: relative;
+  }
+
+  .timeline-header {
+    padding: 80px 48px 40px;
+    border-bottom: 1px solid rgba(200,0,10,0.2);
+  }
+
+  .timeline-title {
+    font-family: var(--display);
+    font-size: clamp(40px, 6vw, 72px);
+    color: var(--cream);
+  }
+
+  .timeline-scroll-container {
+    position: relative;
+    height: 600vh;
+  }
+
+  .timeline-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .timeline-year-panel {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px;
+    border-right: 1px solid rgba(200,0,10,0.3);
+    position: relative;
+    z-index: 2;
+    background: var(--black);
+  }
+
+  .timeline-current-year {
+    font-family: var(--display);
+    font-size: 96px;
+    line-height: 1;
+    color: var(--red);
+    transition: opacity 0.3s;
+  }
+
+  .timeline-current-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    text-transform: uppercase;
+    margin-top: 12px;
+  }
+
+  .timeline-progress-line {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 2px;
+    height: 0%;
+    background: var(--red);
+    transition: height 0.1s linear;
+  }
+
+  .timeline-events-track {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .timeline-events-inner {
+    display: flex;
+    gap: 0;
+    position: absolute;
+    left: 0;
+    will-change: transform;
+  }
+
+  .timeline-event {
+    width: calc(100vw - 280px);
+    flex-shrink: 0;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.2;
+    transition: opacity 0.4s ease;
+  }
+
+  .timeline-event.active { opacity: 1; }
+
+  .timeline-event-year {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+
+  .timeline-event-title {
+    font-family: var(--display);
+    font-size: clamp(36px, 5vw, 64px);
+    color: var(--cream);
+    line-height: 0.95;
+    margin-bottom: 24px;
+  }
+
+  .timeline-event-body {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--ash);
+    max-width: 560px;
+    margin-bottom: 32px;
+  }
+
+  .timeline-event-img {
+    width: 100%;
+    max-width: 500px;
+    height: 240px;
+    object-fit: cover;
+    filter: grayscale(0.6) contrast(1.1);
+    border: 1px solid rgba(200,0,10,0.2);
+  }
+
+  /* ── APPLICATIONS ─────────────────────────────────────────── */
+  #applications {
+    position: relative;
+    height: 500vh;
+  }
+
+  .applications-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  .applications-image-side {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-image {
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    filter: grayscale(0.4) brightness(0.7);
+    transition: opacity 0.6s ease;
+  }
+
+  .app-image.active { opacity: 1; }
+
+  .applications-text-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 64px;
+    position: relative;
+  }
+
+  .app-panel {
+    position: absolute;
+    inset: 80px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+  }
+
+  .app-panel.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .app-number {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--dim-red);
+    margin-bottom: 20px;
+  }
+
+  .app-title {
+    font-family: var(--display);
+    font-size: clamp(40px, 5vw, 68px);
+    line-height: 0.92;
+    color: var(--cream);
+    margin-bottom: 28px;
+  }
+
+  .app-body {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--ash);
+    max-width: 440px;
+  }
+
+  .app-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--red);
+    margin: 24px 0;
+  }
+
+  .applications-header {
+    padding: 80px 48px 0;
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  /* ── IMPLICATIONS ─────────────────────────────────────────── */
+  #implications {
+    padding: 120px 48px;
+    background: var(--charcoal);
+  }
+
+  .implications-title {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 100px);
+    line-height: 0.9;
+    margin-bottom: 80px;
+    color: var(--cream);
+  }
+
+  .implications-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(200,0,10,0.15);
+  }
+
+  .implication-card {
+    background: var(--charcoal);
+    padding: 48px 40px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .implication-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .implication-card:nth-child(2) { transition-delay: 0.15s; }
+  .implication-card:nth-child(3) { transition-delay: 0.3s; }
+
+  .implication-num {
+    font-family: var(--display);
+    font-size: 64px;
+    color: var(--red);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .implication-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 16px;
+  }
+
+  .implication-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ash);
+  }
+
+  /* ── STATISTICS ───────────────────────────────────────────── */
+  #statistics {
+    padding: 120px 48px;
+    text-align: center;
+  }
+
+  .stats-title {
+    font-family: var(--display);
+    font-size: clamp(40px, 6vw, 72px);
+    color: var(--cream);
+    margin-bottom: 80px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 48px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-number {
+    font-family: var(--display);
+    font-size: clamp(48px, 6vw, 80px);
+    color: var(--red);
+    line-height: 1;
+    display: block;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    text-transform: uppercase;
+    margin-top: 12px;
+    display: block;
+  }
+
+  /* ── CONCLUSION ───────────────────────────────────────────── */
+  #conclusion {
+    position: relative;
+    height: 150vh;
+  }
+
+  .conclusion-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px;
+    overflow: hidden;
+  }
+
+  .conclusion-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Nagasakibomb.jpg/1280px-Nagasakibomb.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.15) grayscale(0.5);
+  }
+
+  .conclusion-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+  }
+
+  .conclusion-quote {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 80px);
+    line-height: 0.95;
+    color: var(--cream);
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .conclusion-quote.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .conclusion-attr {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    text-transform: uppercase;
+  }
+
+  /* ── FOOTER ───────────────────────────────────────────────── */
+  footer {
+    padding: 60px 48px;
+    border-top: 1px solid rgba(200,0,10,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: var(--display);
+    font-size: 28px;
+    color: var(--cream);
+  }
+
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ash);
+  }
+
+  /* ── ANIMATIONS ───────────────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── SCROLLBAR ────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--dim-red); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<nav>
+  <span class="nav-logo">Nuclear Warfare — Educational</span>
+  <ul class="nav-links">
+    <li><a href="#timeline">History</a></li>
+    <li><a href="#applications">Applications</a></li>
+    <li><a href="#implications">Implications</a></li>
+    <li><a href="#conclusion">Future</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-sticky">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-image-reveal" id="heroReveal"></div>
+    <div class="hero-grain"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Understanding Nuclear Dynamics</p>
+      <h1 class="hero-title">Holy<br><span>Nuclear</span><br>Warfare</h1>
+      <p class="hero-sub">The power that reshaped humanity — explore the history, science, and consequences of the most destructive force ever created.</p>
+    </div>
+    <p class="hero-scroll-hint">↓ scroll to explore</p>
+  </div>
+</section>
+
+<!-- ── INTRO ───────────────────────────────────────────────── -->
+<section id="intro">
+  <p class="section-label reveal">01 — What Are Nuclear Weapons</p>
+  <h2 class="intro-headline reveal">Energy that<br>moves worlds.<br>And ends them.</h2>
+  <p class="intro-body reveal">Nuclear weapons release immense energy from atomic reactions — either splitting atoms apart (fission) or fusing them together (fusion). The result is an explosion capable of levelling entire cities in seconds. But beyond raw destruction, nuclear weapons are defined by what they represent: the moment humanity gained the power to end itself.</p>
+</section>
+
+<!-- ── TIMELINE ────────────────────────────────────────────── -->
+<section id="timeline">
+  <div class="timeline-header reveal">
+    <p class="section-label">02 — History &amp; Evolution</p>
+    <h2 class="timeline-title">The Arms Race</h2>
+  </div>
+  <div class="timeline-scroll-container">
+    <div class="timeline-sticky">
+      <div class="timeline-year-panel">
+        <div class="timeline-current-year" id="timelineYear">1939</div>
+        <div class="timeline-current-label" id="timelineLabel">The Beginning</div>
+        <div class="timeline-progress-line" id="timelineLine"></div>
+      </div>
+      <div class="timeline-events-track">
+        <div class="timeline-events-inner" id="timelineTrack">
+
+          <div class="timeline-event active" data-year="1939" data-label="The Beginning">
+            <p class="timeline-event-year">1939</p>
+            <h3 class="timeline-event-title">Einstein Writes<br>to Roosevelt</h3>
+            <p class="timeline-event-body">Albert Einstein and Leo Szilard warn President Roosevelt that Nazi Germany may be developing atomic weapons. This letter sets in motion the Manhattan Project — the most ambitious scientific undertaking in history, involving over 130,000 people across three countries.</p>
+            <img class="timeline-event-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Albert_Einstein_Head.jpg/800px-Albert_Einstein_Head.jpg" alt="Einstein">
+          </div>
+
+          <div class="timeline-event" data-year="1945" data-label="Trinity Test">
+            <p class="timeline-event-year">July 16, 1945</p>
+            <h3 class="timeline-event-title">Trinity.<br>The First Detonation.</h3>
+            <p class="timeline-event-body">In the New Mexico desert, the world's first nuclear device detonates. The explosion equals 21,000 tons of TNT. J. Robert Oppenheimer recalls a line from Hindu scripture: "Now I am become Death, the destroyer of worlds." Humanity has crossed a threshold it can never uncross.</p>
+            <img class="timeline-event-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Trinity_shot_color.jpg/1280px-Trinity_shot_color.jpg" alt="Trinity Test">
+          </div>
+
+          <div class="timeline-event" data-year="1945" data-label="Hiroshima">
+            <p class="timeline-event-year">August 6, 1945</p>
+            <h3 class="timeline-event-title">Hiroshima<br>Erased.</h3>
+            <p class="timeline-event-body">At 8:15 AM, "Little Boy" detonates 600 metres above Hiroshima. 70,000 people die instantly. By the end of 1945, the death toll reaches 140,000. Shadows of vaporised human beings are burned into stone steps. Nothing in the history of warfare had ever moved this fast.</p>
+            <img class="timeline-event-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Atomic_bombing_of_Japan.jpg/1280px-Atomic_bombing_of_Japan.jpg" alt="Hiroshima">
+          </div>
+
+          <div class="timeline-event" data-year="1949" data-label="Soviet Bomb">
+            <p class="timeline-event-year">1949</p>
+            <h3 class="timeline-event-title">The Soviets<br>Test Joe-1.</h3>
+            <p class="timeline-event-body">The United States loses its nuclear monopoly. The Soviet Union detonates its first atomic bomb, shocking Western intelligence who thought it would take until 1953. The Cold War arms race begins in earnest. Two superpowers now hold the power to destroy each other — and the world.</p>
+            <img class="timeline-event-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/RDS-1_Tsar.jpg/1280px-RDS-1_Tsar.jpg" alt="Soviet Test">
+          </div>
+
+          <div class="timeline-event" data-year="1962" data-label="Cuban Missile Crisis">
+            <p class="timeline-event-year">1962</p>
+            <h3 class="timeline-event-title">13 Days<br>From Annihilation.</h3>
+            <p class="timeline-event-body">Soviet missiles discovered in Cuba. For 13 days, the world holds its breath. A single miscommunication, a single order misread — and the missiles fly. The crisis ends, but reveals how precarious the balance truly is. We came closer to nuclear war than most people know.</p>
+            <img class="timeline-event-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Cuban_Missile_Crisis_-_Missiles_in_Cuba_2.jpg/1280px-Cuban_Missile_Crisis_-_Missiles_in_Cuba_2.jpg" alt="Cuban Missile Crisis">
+          </div>
+
+          <div class="timeline-event" data-year="2024" data-label="Today">
+            <p class="timeline-event-year">Today</p>
+            <h3 class="timeline-event-title">12,500<br>Warheads Remain.</h3>
+            <p class="timeline-event-body">Nine countries now possess nuclear weapons. Despite arms reduction treaties, the global arsenal retains the capacity for civilisation-ending destruction many times over. The weapons have never been used since Nagasaki — but they have never stopped existing either.</p>
+            <img class="timeline-event-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Minuteman_III_MIRV_paths.svg/1280px-Minuteman_III_MIRV_paths.svg.png" alt="Modern Missiles">
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── APPLICATIONS ────────────────────────────────────────── -->
+<section id="applications">
+  <div class="applications-sticky">
+    <div class="applications-image-side">
+      <img class="app-image active" id="appImg0" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Nagasakibomb.jpg/800px-Nagasakibomb.jpg" alt="Deterrence">
+      <img class="app-image" id="appImg1" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Nuclear_Power_Plant_Cattenom.jpg/1280px-Nuclear_Power_Plant_Cattenom.jpg" alt="Nuclear Power">
+      <img class="app-image" id="appImg2" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Linear_accelerator_at_Daresbury.jpg/1280px-Linear_accelerator_at_Daresbury.jpg" alt="Medicine">
+      <img class="app-image" id="appImg3" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Minuteman_III_MIRV_paths.svg/1280px-Minuteman_III_MIRV_paths.svg.png" alt="Strategy">
+    </div>
+
+    <div class="applications-text-side">
+      <div class="app-panel active" id="appPanel0">
+        <p class="app-number">01 / 04 — Applications</p>
+        <h3 class="app-title">Mutually<br>Assured<br>Destruction</h3>
+        <div class="app-divider"></div>
+        <p class="app-body">MAD is the doctrine that kept the Cold War cold. If both sides can annihilate each other, neither dares strike first. It is deterrence through existential terror — a balance of power maintained by the shared guarantee of total destruction. Grotesque in theory. Effective in practice.</p>
+      </div>
+
+      <div class="app-panel" id="appPanel1">
+        <p class="app-number">02 / 04 — Applications</p>
+        <h3 class="app-title">Nuclear<br>Power<br>Generation</h3>
+        <div class="app-divider"></div>
+        <p class="app-body">The same fission reaction that destroyed Hiroshima powers millions of homes. Nuclear power produces enormous energy with near-zero carbon emissions. Today it supplies 10% of the world's electricity. The debate over its safety versus its necessity defines the energy conversation of our century.</p>
+      </div>
+
+      <div class="app-panel" id="appPanel2">
+        <p class="app-number">03 / 04 — Applications</p>
+        <h3 class="app-title">Medical<br>Applications</h3>
+        <div class="app-divider"></div>
+        <p class="app-body">Radiation that kills in war saves lives in medicine. Radiotherapy targets and destroys cancer cells. Nuclear imaging — PET scans, MRI — allows doctors to see inside the human body with extraordinary precision. The same physics that powers bombs has become one of medicine's most powerful tools.</p>
+      </div>
+
+      <div class="app-panel" id="appPanel3">
+        <p class="app-number">04 / 04 — Applications</p>
+        <h3 class="app-title">Strategic<br>Deterrence<br>Today</h3>
+        <div class="app-divider"></div>
+        <p class="app-body">Modern nuclear strategy goes far beyond MAD. Submarine-launched missiles ensure second-strike capability. Tactical nukes blur the line between conventional and nuclear war. As new powers join the nuclear club and old treaties collapse, the strategic landscape grows more complex — and more dangerous — by the decade.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMPLICATIONS ────────────────────────────────────────── -->
+<section id="implications">
+  <p class="section-label reveal">04 — Implications</p>
+  <h2 class="implications-title reveal">The Cost<br>of Power.</h2>
+  <div class="implications-grid">
+    <div class="implication-card">
+      <div class="implication-num">01</div>
+      <div class="implication-title">Humanitarian Cost</div>
+      <p class="implication-body">The two bombs dropped on Japan killed between 129,000 and 226,000 people — mostly civilians. Survivors, known as hibakusha, faced radiation sickness, cancers, and social stigma for decades. The humanitarian case against nuclear weapons is built on these lives.</p>
+    </div>
+    <div class="implication-card">
+      <div class="implication-num">02</div>
+      <div class="implication-title">Environmental Impact</div>
+      <p class="implication-body">A large-scale nuclear exchange could trigger "nuclear winter" — soot and debris blocking sunlight for years, causing global crop failure and mass starvation. Even a limited regional nuclear war between India and Pakistan could kill more people through famine than through the blasts themselves.</p>
+    </div>
+    <div class="implication-card">
+      <div class="implication-num">03</div>
+      <div class="implication-title">Geopolitical Tension</div>
+      <p class="implication-body">Nuclear weapons do not just kill — they reshape international order. They grant their possessors a form of immunity from conventional military pressure. Nations that acquire them change their standing in global politics permanently. Proliferation is thus not merely a security issue but a civilisational one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATISTICS ──────────────────────────────────────────── -->
+<section id="statistics">
+  <h2 class="stats-title reveal">By the numbers.</h2>
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <span class="stat-number" data-target="12500">0</span>
+      <span class="stat-label">Warheads worldwide</span>
+    </div>
+    <div class="stat-item reveal">
+      <span class="stat-number" data-target="9">0</span>
+      <span class="stat-label">Nuclear-armed nations</span>
+    </div>
+    <div class="stat-item reveal">
+      <span class="stat-number" data-target="200000">0</span>
+      <span class="stat-label">Lives lost in Japan 1945</span>
+    </div>
+    <div class="stat-item reveal">
+      <span class="stat-number" data-target="77">0</span>
+      <span class="stat-label">Years since last use in war</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONCLUSION ──────────────────────────────────────────── -->
+<section id="conclusion">
+  <div class="conclusion-sticky">
+    <div class="conclusion-bg"></div>
+    <div class="conclusion-content">
+      <blockquote class="conclusion-quote" id="conclusionQuote">"The unleashed power of the atom has changed everything save our modes of thinking, and we thus drift toward unparalleled catastrophe."</blockquote>
+      <p class="conclusion-attr">— Albert Einstein, 1946</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────────── -->
+<footer>
+  <span class="footer-logo">Nuclear Warfare</span>
+  <span class="footer-note">An educational project — Holy Nuclear Warfare</span>
+</footer>
+
+<script>
+// ── PROGRESS BAR ─────────────────────────────────────────────
+const progressBar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const total = document.body.scrollHeight - window.innerHeight;
+  progressBar.style.width = (scrolled / total * 100) + '%';
+});
+
+// ── HERO PARALLAX + REVEAL ────────────────────────────────────
+const heroBg = document.getElementById('heroBg');
+const heroReveal = document.getElementById('heroReveal');
+const heroSection = document.getElementById('hero');
+
+window.addEventListener('scroll', () => {
+  const heroH = heroSection.offsetHeight;
+  const scrolled = window.scrollY;
+  const progress = Math.min(scrolled / (heroH * 0.5), 1);
+
+  heroBg.style.transform = `scale(${1.1 - progress * 0.05})`;
+  heroReveal.style.opacity = progress;
+  heroReveal.style.transform = `scale(${0.92 + progress * 0.08})`;
+});
+
+// ── TIMELINE HORIZONTAL SCROLL ────────────────────────────────
+const timelineSection = document.getElementById('timeline');
+const timelineTrack = document.getElementById('timelineTrack');
+const timelineYear = document.getElementById('timelineYear');
+const timelineLabel = document.getElementById('timelineLabel');
+const timelineLine = document.getElementById('timelineLine');
+const events = document.querySelectorAll('.timeline-event');
+const totalEvents = events.length;
+
+window.addEventListener('scroll', () => {
+  const rect = timelineSection.getBoundingClientRect();
+  const sectionTop = -rect.top;
+  const sectionHeight = timelineSection.offsetHeight - window.innerHeight;
+  const progress = Math.max(0, Math.min(sectionTop / sectionHeight, 1));
+
+  const trackWidth = (totalEvents - 1) * (window.innerWidth - 280);
+  const offset = progress * trackWidth;
+  timelineTrack.style.transform = `translateX(${-offset}px)`;
+
+  const eventIndex = Math.min(Math.floor(progress * totalEvents), totalEvents - 1);
+  events.forEach((e, i) => e.classList.toggle('active', i === eventIndex));
+
+  const activeEvent = events[eventIndex];
+  timelineYear.textContent = activeEvent.dataset.year;
+  timelineLabel.textContent = activeEvent.dataset.label;
+  timelineLine.style.height = (progress * 100) + '%';
+});
+
+// ── APPLICATIONS SCROLL ───────────────────────────────────────
+const appSection = document.getElementById('applications');
+const appPanels = document.querySelectorAll('.app-panel');
+const appImgs = document.querySelectorAll('.app-image');
+const totalApps = appPanels.length;
+
+window.addEventListener('scroll', () => {
+  const rect = appSection.getBoundingClientRect();
+  const sectionTop = -rect.top;
+  const sectionHeight = appSection.offsetHeight - window.innerHeight;
+  const progress = Math.max(0, Math.min(sectionTop / sectionHeight, 1));
+  const index = Math.min(Math.floor(progress * totalApps), totalApps - 1);
+
+  appPanels.forEach((p, i) => p.classList.toggle('active', i === index));
+  appImgs.forEach((img, i) => img.classList.toggle('active', i === index));
+});
+
+// ── INTERSECTION OBSERVER: REVEAL + COUNTERS ──────────────────
+const reveals = document.querySelectorAll('.reveal');
+const cards = document.querySelectorAll('.implication-card');
+const conclusionQuote = document.getElementById('conclusionQuote');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+reveals.forEach(el => observer.observe(el));
+cards.forEach(el => observer.observe(el));
+observer.observe(conclusionQuote);
+
+// Counter animation
+const counters = document.querySelectorAll('.stat-number[data-target]');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = parseInt(el.dataset.target);
+    const duration = 2000;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.floor(current).toLocaleString();
+      if (current >= target) clearInterval(timer);
+    }, 16);
+    counterObserver.unobserve(el);
+  });
+}, { threshold: 0.5 });
+
+counters.forEach(el => counterObserver.observe(el));
+</script>
+</body>
+</html>
